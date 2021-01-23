@@ -5,6 +5,18 @@ It has been ispired by a business-logic challenge of Port Swigger:
 
 https://portswigger.net/web-security/logic-flaws/examples/lab-logic-flaws-infinite-money
 
+## Installation
+
+First download and install **composer** from here:
+
+https://getcomposer.org/download/
+
+Then:
+
+```bash
+$ php composer.phar install
+```
+
 ## Usage
 
 ```bash
