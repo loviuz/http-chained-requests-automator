@@ -20,7 +20,7 @@ $ php composer.phar install
 ## Usage
 
 ```bash
-$ php hcra.php params.json DEBUG
+$ php hcra.php params.json [DEBUG]
 ```
 
 - params.json: is the filename of the JSON file with specifications of the HTTP requests
