@@ -85,16 +85,21 @@ foreach ($requests as $request) {
     echo $colors->getColoredString('[>]', 'red').' '.$colors->getColoredString('BODY           :', 'cyan').' '.$colors->getColoredString($request['body'], 'yellow').'
 ';
 
+    $guzzle_options = [
+        'body' => $request['body'],
+        'headers' => $headers,
+    ];
+
+    if( isset($request['extra_guzzle_options']) ){
+        $guzzle_options = array_merge( $guzzle_options, $request['extra_guzzle_options'][0] );
+    }
 
     // Execute the request!
     $client = new \GuzzleHttp\Client();
     $response = $client->request(
         $request['method'],
         replace_values($request['url'], $all_values),
-        [
-            'body' => $request['body'],
-            'headers' => $headers,
-        ]
+        $guzzle_options
     );
 
     // Get values from regexp on headers
