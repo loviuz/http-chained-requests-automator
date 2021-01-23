@@ -33,19 +33,36 @@ To configure HTTP request you have to code your custom JSON file. You can start 
 ```json
 [
     {
-        "url": "http://localhost/mysite/login",
-        "method": "POST",
+        "url": "http://localhost/mysite/",
+        "method": "GET",
         "headers": null,
-        "body": "username=admin&password=s3cr3t",
+        "body": null,
         "header-regexp": [
-            {
-                "next_url": "/Location: (.+?)$/"
-            },
             {
                 "cookie": "/Set-Cookie: (.+?)$/"
             }
         ],
         "body-regexp": null
+    },
+    {
+        "url": "http://localhost/mysite/",
+        "method": "POST",
+        "headers": {
+            "Cookie": "§cookie§",
+            "Content-Type": "application/x-www-form-urlencoded"
+        },
+        "body": "username=admin&password=s3cr3t",
+        "header-regexp": [
+            {
+                "next_url": "/Location: (.+)/"
+            }
+        ],
+        "body-regexp": null,
+        "extra_guzzle_options": [
+            {
+                "allow_redirects": false
+            }
+        ]
     },
     {
         "url": "http://localhost§next_url§",
@@ -57,19 +74,27 @@ To configure HTTP request you have to code your custom JSON file. You can start 
         "header-regexp": null,
         "body-regexp": [
             {
-                "email": "/<p>Your email is: (.+?)<\\/p>/"
+                "email": "/<p>Your email is (.+)!<\\/p>/"
             }
         ]
     },
     {
-        "url": "http://localhost/mysite/sign-up",
-        "method": "POST",
+        "url": "http://localhost§next_url§?email=§email§",
+        "method": "GET",
         "headers": {
             "Cookie": "§cookie§"
         },
-        "body": "op=signup&email=§email§",
-        "header-regexp": null,
-        "body-regexp": null
+        "body": null,
+        "header-regexp": [
+            {
+                "flag1": "/Set-Cookie: flag2=(.+?);/"
+            }
+        ],
+        "body-regexp": [
+            {
+                "flag2": "/<p>Congratulations, the flag is: (.+?)<\\/p>/"
+            }
+        ]
     }
 ]
 ```
@@ -81,6 +106,7 @@ Every JSON object is an HTTP request with specific parameters:
 - **body**: the body of the request in case you send a POST request
 - **header-regexp**: an array of regular expressions you want to use to extract values from the headers. IMPORTANT: only the first value per regexp will be matched
 - **body-regexp**: like header-regexp, but the values will be matched against the response body
+- **extra_guzzle_options**: array of extra Guzzle options. Here you can find a full list of options: https://docs.guzzlephp.org/en/stable/request-options.html
 
 Example:
 
