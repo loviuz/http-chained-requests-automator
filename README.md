@@ -1,6 +1,8 @@
 # HTTP Chained Requests Automator
 This PHP script automates and chains HTTP requests, extracting values from headers or body and use them for the next requests. Very useful for penetration tests.
 
+![image](https://github.com/loviuz/http-chained-requests-automator/blob/main/screenshots/hcra.jpg?raw=true)
+
 It has been ispired by a business-logic challenge of Port Swigger:
 
 https://portswigger.net/web-security/logic-flaws/examples/lab-logic-flaws-infinite-money
@@ -136,5 +138,5 @@ to:
 until you match another **next_url** values with another regular expression with the next requests.
 
 ## TODO
- - better error managing
+ - better error handling
  - add some logics, so for example the script can restart from a specific request after getting some specific results from the variables
