@@ -4,7 +4,6 @@ use GuzzleHttp\Psr7;
 
 include __DIR__.'/vendor/autoload.php';
 
-$debug = false;
 $colors = new Wujunze\Colors();
 
 if( count($argv) < 2 ){
@@ -37,7 +36,7 @@ It does not seems a good JSON file!', 'green').'
     exit();
 }
 
-$debug = $requests['configuration']['debug'];
+$verbose_level = $requests['configuration']['verbose_level'];
 
 // Loop through URLs :-)
 echo $pointer." Found ".$colors->getColoredString( count($requests['urls']), 'yellow')." requests!\n\n";
@@ -49,6 +48,9 @@ $s = 1;
 
 // Placeholder for values extracted by regexp
 $all_values = [];
+
+$tests_run = 0;
+$tests_ok = 0;
 
 foreach ($requests['urls'] as $request) {
     $new_values = [];
@@ -66,19 +68,26 @@ foreach ($requests['urls'] as $request) {
     }
 
     // Preview of the request
-    echo $colors->getColoredString('[>]', 'red').' '.$colors->getColoredString('REQUEST '.$s.'/'.count($requests), 'yellow').'
+    echo $colors->getColoredString( '['.$s.'/'.count($requests['urls']).'] '.$request['title'], 'yellow')."\n";
+
+    if( $verbose_level == 2 ){
+        echo '
 '.$colors->getColoredString('[>]', 'red').' '.$colors->getColoredString('METHOD         :', 'cyan').' '.$colors->getColoredString($request['method'], 'yellow').'
 '.$colors->getColoredString('[>]', 'red').' '.$colors->getColoredString('URL            :', 'cyan').' '.$colors->getColoredString($request['url'], 'yellow').'
-'.$colors->getColoredString('[>]', 'red').' '.$colors->getColoredString('HEADERS        :', 'cyan').'
-';
-
-    // Print all headers
-    foreach( $headers as $name => $value ){
-        echo '    '.$name.': '.$value."\n";
+'.$colors->getColoredString('[>]', 'red').' '.$colors->getColoredString('HEADERS        :', 'cyan')."\n";
     }
 
-    echo $colors->getColoredString('[>]', 'red').' '.$colors->getColoredString('BODY           :', 'cyan').' '.$colors->getColoredString($request['body'], 'yellow').'
-';
+    // Print all headers
+    if( $verbose_level == 2 ){
+        foreach( $headers as $name => $value ){
+            echo '    '.$name.': '.$value."\n";
+        }
+    }
+
+    // Print request body
+    if( $verbose_level == 2 ){
+        echo $colors->getColoredString('[>]', 'red').' '.$colors->getColoredString('BODY           :', 'cyan').' '.$colors->getColoredString($request['body'], 'yellow')."\n";
+    }
 
     $guzzle_options = [
         'body' => $request['body'],
@@ -112,7 +121,7 @@ foreach ($requests['urls'] as $request) {
         }
     }
 
-    if( $debug ){
+    if( $verbose_level == 3 ){
         echo $response->getBody();
     }
 
@@ -128,19 +137,70 @@ foreach ($requests['urls'] as $request) {
     }
 
     // Prints out found values with regexp!
-    if( !empty($request['header-regexp']) || !empty($request['body-regexp']) ){
-        foreach( $new_values as $name => $value ){
-            echo $colors->getColoredString('[<]', 'green').' '.$name.': '.$colors->getColoredString($value, 'yellow')."\n";
+    if( $verbose_level == 2 ){
+        if( !empty($request['header-regexp']) || !empty($request['body-regexp']) ){
+            foreach( $new_values as $name => $value ){
+                echo $colors->getColoredString('[<]', 'green').' '.$name.': '.$colors->getColoredString($value, 'yellow')."\n";
+            }
         }
     }
 
+    // Merge all values found
     if( !empty($new_values) ){
         $all_values = array_merge( $all_values, $new_values );
+    }
+
+    // If there is an expected value, check if it corresponds
+    if( !empty($request['header-expected']) ){
+        foreach( $request['header-expected'] as $expected_name => $expected_value ){
+            $tests_run++;
+
+            if( isset($new_values[$expected_name]) ){
+                if( $expected_value != $new_values[$expected_name] ){
+                    echo $colors->getColoredString('[X]', 'red').' '.$expected_name.': '.$colors->getColoredString($new_values[$expected_name], 'red')." (should be ".$colors->getColoredString($expected_value, 'yellow').")\n";
+                } else {
+                    $tests_ok++;
+                    echo $colors->getColoredString('[V]', 'green').' '.$expected_name.': '.$colors->getColoredString($new_values[$expected_name], 'green')."\n";
+                }
+            } else {
+                echo $colors->getColoredString('[X]', 'red').' '.$expected_name.': '.$colors->getColoredString('<not found>', 'red')." (should be ".$colors->getColoredString($expected_value, 'yellow').")\n";
+            }
+        }
+    }
+
+    if( !empty($request['body-expected']) ){
+        foreach( $request['body-expected'] as $expected_name => $expected_value ){
+            $tests_run++;
+
+            if( isset($new_values[$expected_name]) ){
+                if( $expected_value != $new_values[$expected_name] ){
+                    echo $colors->getColoredString('[X]', 'red').' '.$expected_name.': '.$colors->getColoredString($new_values[$expected_name], 'red')." (should be ".$colors->getColoredString($expected_value, 'yellow').")\n";
+                } else {
+                    $tests_ok++;
+                    echo $colors->getColoredString('[V]', 'green').' '.$expected_name.': '.$colors->getColoredString($new_values[$expected_name], 'green')."\n";
+                }
+            } else {
+                echo $colors->getColoredString('[X]', 'red').' '.$expected_name.': '.$colors->getColoredString('<not found>', 'red')." (should be ".$colors->getColoredString($expected_value, 'yellow').")\n";
+            }
+        }
     }
 
     $s++;
 
     echo "\n";
+}
+
+// Prints the result of the tests
+if( $tests_run > 0 ){
+    echo "Tests passed:\n";
+
+    if( $tests_ok == $tests_run ){
+        echo $colors->getColoredString('[V] ', 'green');
+    } else {
+        echo $colors->getColoredString('[X] ', 'red');
+    }
+
+    echo $tests_ok.'/'.$tests_run."\n";
 }
 
 
