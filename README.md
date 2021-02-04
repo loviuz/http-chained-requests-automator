@@ -102,12 +102,16 @@ To configure HTTP request you have to code your custom JSON file. You can start 
 ```
 
 Every JSON object is an HTTP request with specific parameters:
+- **configuration -> verbose_level**: the verbosity of the output. It accepts values from 1 to 3
+- **title**: the title of the to request
 - **url**: the URL to request
 - **method**: GET|POST (you could also use PUT, DELETE, etc, but not yet tested!)
 - **headers**: a JSON array with all headers you want to send with the request
 - **body**: the body of the request in case you send a POST request
 - **header-regexp**: an array of regular expressions you want to use to extract values from the headers. IMPORTANT: only the first value per regexp will be matched
 - **body-regexp**: like header-regexp, but the values will be matched against the response body
+- **header-expected**: an array of key/value to look for in the response headers (useful for test purpose)
+- **body-expected**: an array of key/value to look for in the body headers (useful for test purpose)
 - **extra_guzzle_options**: array of extra Guzzle options. Here you can find a full list of options: https://docs.guzzlephp.org/en/stable/request-options.html
 
 Example:
