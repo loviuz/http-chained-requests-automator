@@ -12,12 +12,6 @@ if( count($argv) < 2 ){
     exit();
 }
 
-if( count($argv) == 3 ){
-    if( $argv[2] == 'DEBUG' ){
-        $debug = true;
-    }
-}
-
 if( !file_exists($argv[1]) ){
     usage();
     echo $colors->getColoredString('
@@ -43,9 +37,10 @@ It does not seems a good JSON file!', 'green').'
     exit();
 }
 
+$debug = $requests['configuration']['debug'];
 
 // Loop through URLs :-)
-echo $pointer." Found ".$colors->getColoredString( count($requests), 'yellow')." requests!\n\n";
+echo $pointer." Found ".$colors->getColoredString( count($requests['urls']), 'yellow')." requests!\n\n";
 
 
 
@@ -55,7 +50,7 @@ $s = 1;
 // Placeholder for values extracted by regexp
 $all_values = [];
 
-foreach ($requests as $request) {
+foreach ($requests['urls'] as $request) {
     $new_values = [];
 
     // Apply regexp substitution on url, body and headers with previous values

@@ -1,66 +1,73 @@
-[
+{
+    "configuration": 
     {
-        "url": "http://localhost/mysite/",
-        "method": "GET",
-        "headers": null,
-        "body": null,
-        "header-regexp": [
-            {
-                "cookie": "/Set-Cookie: (.+?)$/"
-            }
-        ],
-        "body-regexp": null
-    },
-    {
-        "url": "http://localhost/mysite/",
-        "method": "POST",
-        "headers": {
-            "Cookie": "§cookie§",
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        "body": "username=admin&password=s3cr3t",
-        "header-regexp": [
-            {
-                "next_url": "/Location: (.+)/"
-            }
-        ],
-        "body-regexp": null,
-        "extra_guzzle_options": [
-            {
-                "allow_redirects": false
-            }
-        ]
-    },
-    {
-        "url": "http://localhost§next_url§",
-        "method": "GET",
-        "headers": {
-            "Cookie": "§cookie§"
-        },
-        "body": null,
-        "header-regexp": null,
-        "body-regexp": [
-            {
-                "email": "/<p>Your email is (.+)!<\\/p>/"
-            }
-        ]
-    },
-    {
-        "url": "http://localhost§next_url§?email=§email§",
-        "method": "GET",
-        "headers": {
-            "Cookie": "§cookie§"
-        },
-        "body": null,
-        "header-regexp": [
-            {
-                "flag1": "/Set-Cookie: flag2=(.+?);/"
-            }
-        ],
-        "body-regexp": [
-            {
-                "flag2": "/<p>Congratulations, the flag is: (.+?)<\\/p>/"
-            }
-        ]
+        "debug": false
     }
-]
+    ,
+    "urls": [
+        {
+            "url": "http://localhost/mysite/",
+            "method": "GET",
+            "headers": null,
+            "body": null,
+            "header-regexp": [
+                {
+                    "cookie": "/Set-Cookie: (.+?)$/"
+                }
+            ],
+            "body-regexp": null
+        },
+        {
+            "url": "http://localhost/mysite/",
+            "method": "POST",
+            "headers": {
+                "Cookie": "§cookie§",
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            "body": "username=admin&password=s3cr3t",
+            "header-regexp": [
+                {
+                    "next_url": "/Location: (.+)/"
+                }
+            ],
+            "body-regexp": null,
+            "extra_guzzle_options": [
+                {
+                    "allow_redirects": false
+                }
+            ]
+        },
+        {
+            "url": "http://localhost§next_url§",
+            "method": "GET",
+            "headers": {
+                "Cookie": "§cookie§"
+            },
+            "body": null,
+            "header-regexp": null,
+            "body-regexp": [
+                {
+                    "email": "/<p>Your email is (.+)!<\\/p>/"
+                }
+            ]
+        },
+        {
+            "url": "http://localhost§next_url§?email=§email§",
+            "method": "GET",
+            "headers": {
+                "Cookie": "§cookie§"
+            },
+            "body": null,
+            "header-regexp": [
+                {
+                    "flag1": "/Set-Cookie: flag2=(.+?);/"
+                }
+            ],
+            "body-regexp": [
+                {
+                    "flag2": "/<p>Congratulations, the flag is: (.+?)<\\/p>/"
+                }
+            ]
+        }
+    ]
+}
