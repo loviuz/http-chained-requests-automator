@@ -22,83 +22,107 @@ $ php composer.phar install
 ## Usage
 
 ```bash
-$ php hcra.php params.json [DEBUG]
+$ php hcra.php params.json
 ```
 
 - params.json: is the filename of the JSON file with specifications of the HTTP requests
-- DEBUG: use only for debug purpose. It additionally prints out the body response of every HTTP request
 
 ## Configuration
 
 To configure HTTP request you have to code your custom JSON file. You can start from the example in the repository:
 
 ```json
-[
+{
+    "configuration": 
     {
-        "url": "http://localhost/mysite/",
-        "method": "GET",
-        "headers": null,
-        "body": null,
-        "header-regexp": [
-            {
-                "cookie": "/Set-Cookie: (.+?)$/"
-            }
-        ],
-        "body-regexp": null
-    },
-    {
-        "url": "http://localhost/mysite/",
-        "method": "POST",
-        "headers": {
-            "Cookie": "§cookie§",
-            "Content-Type": "application/x-www-form-urlencoded"
-        },
-        "body": "username=admin&password=s3cr3t",
-        "header-regexp": [
-            {
-                "next_url": "/Location: (.+)/"
-            }
-        ],
-        "body-regexp": null,
-        "extra_guzzle_options": [
-            {
-                "allow_redirects": false
-            }
-        ]
-    },
-    {
-        "url": "http://localhost§next_url§",
-        "method": "GET",
-        "headers": {
-            "Cookie": "§cookie§"
-        },
-        "body": null,
-        "header-regexp": null,
-        "body-regexp": [
-            {
-                "email": "/<p>Your email is (.+)!<\\/p>/"
-            }
-        ]
-    },
-    {
-        "url": "http://localhost§next_url§?email=§email§",
-        "method": "GET",
-        "headers": {
-            "Cookie": "§cookie§"
-        },
-        "body": null,
-        "header-regexp": [
-            {
-                "flag1": "/Set-Cookie: flag2=(.+?);/"
-            }
-        ],
-        "body-regexp": [
-            {
-                "flag2": "/<p>Congratulations, the flag is: (.+?)<\\/p>/"
-            }
-        ]
+        "verbose_level": 1
     }
-]
+    ,
+    "urls": [
+        {
+            "title": "First open to get the cookie",
+            "url": "http://localhost/mysite/",
+            "method": "GET",
+            "headers": null,
+            "body": null,
+            "header-regexp": [
+                {
+                    "cookie": "/Set-Cookie: (.+?)$/"
+                }
+            ],
+            "body-regexp": null
+        },
+        {
+            "title": "Login",
+            "url": "http://localhost/mysite/",
+            "method": "POST",
+            "headers": {
+                "Cookie": "§cookie§",
+                "Content-Type": "application/x-www-form-urlencoded"
+            },
+            "body": "username=admin&password=s3cr3t",
+            "header-regexp": [
+                {
+                    "next_url": "/Location: (.+)/"
+                }
+            ],
+            "body-regexp": null,
+            "extra_guzzle_options": [
+                {
+                    "allow_redirects": false
+                }
+            ]
+        },
+        {
+            "title": "Get the email",
+            "url": "http://localhost§next_url§",
+            "method": "GET",
+            "headers": {
+                "Cookie": "§cookie§"
+            },
+            "body": null,
+            "header-regexp": [
+                {
+                    "content_type": "/Content-Type: (.+)/",
+                    "pragma": "/Pragma: (.+)/"
+                }
+            ],
+            "body-regexp": [
+                {
+                    "email": "/<p>Your email is (.+)!<\\/p>/"
+                }
+            ],
+            "header-expected":
+            {
+                "content_type": "text/html; charset=UTF-8",
+                "pragma": "no-cache"
+            },
+            "body-expected":
+            {
+                "email": "dude@dudelang.com"
+            }
+        },
+        {
+            "title": "Get the flags",
+            "url": "http://localhost§next_url§?email=§email§",
+            "method": "GET",
+            "headers": {
+                "Cookie": "§cookie§"
+            },
+            "body": null,
+            "header-regexp": [
+                {
+                    "flag1": "/Set-Cookie: flag2=(.+?);/"
+                }
+            ],
+            "body-regexp": [
+                {
+                    "flag2": "/<p>Congratulations, the flag is: (.+?)<\\/p>/"
+                }
+            ]
+        }
+    ]
+}
 ```
 
 Every JSON object is an HTTP request with specific parameters:

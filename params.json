@@ -1,9 +1,8 @@
 {
     "configuration": 
     {
-        "verbose_level": 1
-    }
-    ,
+        "verbose_level": 2
+    },
     "urls": [
         {
             "title": "First open to get the cookie",
